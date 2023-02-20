@@ -1,5 +1,7 @@
 package nl.techiteasy.controller.Controllers;
 
+import nl.techiteasy.controller.Exceptions.ObjectNameTooLongException;
+import nl.techiteasy.controller.Exceptions.RecordNotFoundException;
 import nl.techiteasy.controller.Model.Television;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,13 +26,19 @@ public class TelevisionController {
         if (id >= 0 && id < televisions.size()) {
             return new ResponseEntity<>(televisions.get(id),HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        throw new RecordNotFoundException("ID not available");
     }
 
     @PostMapping("televisions")
     public ResponseEntity<Television> createTelevision(@RequestBody Television television) {
-        televisions.add(television);
-        return new ResponseEntity<>(television, HttpStatus.CREATED);
+        if (television.name.length() < 30) {
+            System.out.println(television.name.length());
+            televisions.add(television);
+            return new ResponseEntity<>(television, HttpStatus.CREATED);
+        }
+        else {
+            throw new ObjectNameTooLongException("make it under 30 characters");
+        }
     }
 
     @PutMapping("televisions/{id}")
